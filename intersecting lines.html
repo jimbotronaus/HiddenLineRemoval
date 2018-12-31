@@ -1,0 +1,161 @@
+<html>
+   <header></header>
+   <body style="background-color:Black">
+   <canvas id="pane" width="500" height="500" style="border-style:solid" tabindex=0></canvas>
+   	<script>
+   	var c = document.getElementById('pane').getContext('2d');
+
+	var timeStep = 30; // In milliseconds
+	var angle = 0;
+	var size = 20;
+	var w = c.canvas.width;
+	var h = c.canvas.height;
+	var cmTID;
+
+	function inside(point, polygon) {
+		// Returns true if point is inside the polygon.
+	}
+			// dfsdf
+
+	
+	function intersection(a1x,a1y,a2x,a2y,b1x,b1y,b2x,b2y) {
+		var as = (a1y-a2y)/(a1x-a2x);
+		var bs = (b1y-b2y)/(b1x-b2x);
+		var x  = (b1y-a1y+as*a1x-bs*b1x)/(as-bs);
+		var y  = (bs*a1y-as*b1y+bs*as*(b1x-a1x))/(bs-as);
+		var i  = true;
+		if (a1x > a2x) 
+			{if (a1x<x | x<a2x) i=false}
+		else
+			{if (a2x<x | x<a1x) i=false}
+		if (b1x > b2x) 
+			{if (b1x<x | x<b2x) i=false}
+		else
+			{if (b2x<x | x<b1x) i=false}		
+		return [x,y,i];
+	}
+
+	class sprite {
+		constructor(vertices, edges) {
+			this.vertices = vertices;
+			this.edges = edges;
+			this.rotation = 0;
+			this.angle = 0;
+			this.scale = 1;
+			this.vel = {x: 0, y:0};
+			this.pos = {x: 0, y:0};
+			
+			
+		};
+		draw() {
+			var edge=[];
+			var vertex=[];
+			c.save();
+			c.rotate(this.angle*Math.PI/180);
+			c.translate(this.pos.x, this.pos.y);
+ 			for (edge of this.edges) {
+				c.beginPath();
+				c.moveTo(this.vertices[edge[0]][0], this.vertices[edge[0]][1]);
+				for (vertex of edge.slice(1)) {
+					c.lineTo(this.vertices[vertex][0], this.vertices[vertex][1]);
+				};
+				c.closePath();
+				c.stroke();
+			};
+			c.restore();
+		};
+		update(timeDiff) {
+			this.angle += this.rotation*timeDiff/1000;
+			this.pos.x += this.vel.x*timeDiff/1000;
+			this.pos.y += this.vel.y*timeDiff/1000;
+		};
+		stop() {
+			this.vel.x = 0;
+			this.vel.y = 0;
+			this.rotation = 0;
+		}
+	};
+
+	// Keep track of where the mouse is
+	var mouse = {x: 0, y: 0};
+	var v = {x: 0, y:0};
+	var p = {x:0, y:0};
+	c.canvas.onkeydown =
+		function(evt) {
+			// alert(evt.key);
+			if (evt.key == 'ArrowLeft') v.x = -1;
+			if (evt.key == 'ArrowRight') v.x = 1;
+			if (evt.key == 'ArrowUp') v.y = 1;
+			if (evt.key == 'ArrowDown') v.y = -1;
+
+		};
+
+	c.canvas.onmousemove =
+	  function(evt) {
+		mouse.x = evt.clientX;
+		mouse.y = evt.clientY;
+	  };
+
+
+
+	obj = new sprite([[0,0],[100,100],[100,0],[50,50]],[[0,1,2],[1,3,0,1]]);
+	obj2 = new sprite([[100,30],[140,10],[100,40],[150,250]],[[0,3,2],[1,3,0,1]]);
+	obj.vel.x = 0.1;
+	obj2.rotation = 10;
+	timeDiff = timeStep;
+	oldTime = 0;
+	
+
+
+	function update() {
+	  // Clear the canvas
+	  //newTime = Date.now();
+	  //if (oldTime != 0) timeDiff = newTime-OldTime
+	  //oldTime = newTime;
+	  c.fillRect(0, 0, w, h);
+
+	  // Draw our base in the center, rotated by angle
+	  c.strokeStyle="#77FF77";
+	  c.lineWidth=2;
+
+	  var a=[[300,300],[100,100]];
+	  var b=[[400,100],[mouse.x,mouse.y]];
+
+	  // Draw a line from the base to the mouse
+	  c.beginPath();
+	  c.moveTo(b[0][0], b[0][1]);
+	  c.lineTo(b[1][0], b[1][1]);
+	  c.closePath();
+	  c.stroke();
+	  
+	  c.strokeStyle="#FF7777";
+	  c.beginPath();
+	  c.moveTo(a[0][0], a[0][1]);
+	  c.lineTo(a[1][0], a[1][1]);
+	  c.closePath();
+	  c.stroke();
+	  
+	  var i = intersection(a[0][0], a[0][1],a[1][0], a[1][1],b[0][0], b[0][1],b[1][0], b[1][1]);
+	  if (i[2])
+		c.strokeStyle="#7777FF"
+	  else
+	    c.strokeStyle="#770000";
+	  
+	  c.beginPath();
+	  c.moveTo(50, 100);
+	  c.lineTo(i[0], i[1]);
+	  c.closePath();
+	  c.stroke();
+
+	  // Increase the rotation a little each time
+	  angle += 2;
+
+	  clearTimeout(cmTID);
+	  // Do everything again in a while
+	  cmTID = setTimeout(update, timeStep);
+	}
+
+	update();
+	</script>
+   </body>
+</html>

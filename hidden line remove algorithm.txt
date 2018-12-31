@@ -1,0 +1,38 @@
+Initial conditions 3d Model consisting of 
+	vertices 
+	faces as clockwise collection of points.
+	edges as pairs of vertices.
+	Camera position
+	Camera orientation
+	Camera focal length
+	
+rotate scene vertices to compensate for camera orientation.
+translate scene vertices to compensate for camera position.
+apply perspective transformation to vertices
+create nxn table of comparison checks, set upper right triangle to true
+0 1 1 1 1
+0 0 1 1 1
+0 0 0 1 1
+0 0 0 0 1
+0 0 0 0 0
+True means to be tested
+
+Scan for overlapping cubes - only required for optimisation
+If not overlapping set to false
+	(if max(ax1,ax2) < min(bx1,bx2) or max(ay1,ay2) < min(by1,by2)) then set to false)
+
+
+scan for intersecting lines
+	ignore if parallel set comparison entry to false
+	check for intersection
+		if found
+			if both lines invisible, or both lines are bidirectional then skip.
+			work out which line is behind the other (the hidden line)
+			if hidden line is set to be invisible then set comparison entry to false and break (the line is not shown so no point in 
+			if hidding line is bidirectional then set comparison entry to false and break
+			work out position on line as a float from 0 to 1 -  A--------------i-----B , then intersection about 0.7
+			work out which direction is hidden.
+			save intersection point and hidden directions with edge
+			
+scan for lines that do not have intersections to determine if they are shown or hidden.
+	check one end against each 

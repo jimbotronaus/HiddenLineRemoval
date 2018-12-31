@@ -1,0 +1,131 @@
+<html>
+   <header></header>
+   <body style="background-color:Black">
+   <canvas id="pane" width="500" height="500" style="border-style:solid" tabindex=0></canvas>
+   	<script>
+   	var c = document.getElementById('pane').getContext('2d');
+
+	var timeStep = 10; // In milliseconds
+	var angle = 0;
+	var size = 20;
+	var w = c.canvas.width;
+	var h = c.canvas.height;
+	var cmTID;
+
+	class sprite {
+		constructor(vertices, edges) {
+			this.vertices = vertices;
+			this.edges = edges;
+			this.rotation = 0;
+			this.angle = 0;
+			this.scale = 1;
+			this.vel = {x: 0, y:0};
+			this.pos = {x: 0, y:0};
+			
+			
+		};
+		draw() {
+			var edge=[];
+			var vertex=[];
+			c.save();
+			c.rotate(this.angle*Math.PI/180);
+			c.translate(this.pos.x, this.pos.y);
+ 			for (edge of this.edges) {
+				c.beginPath();
+				c.moveTo(this.vertices[edge[0]][0], this.vertices[edge[0]][1]);
+				for (vertex of edge.slice(1)) {
+					c.lineTo(this.vertices[vertex][0], this.vertices[vertex][1]);
+				};
+				c.closePath();
+				c.stroke();
+			};
+			c.restore();
+		};
+		update(timeDiff) {
+			this.angle += this.rotation*timeDiff/1000;
+			this.pos.x += this.vel.x*timeDiff/1000;
+			this.pos.y += this.vel.y*timeDiff/1000;
+		};
+		stop() {
+			this.vel.x = 0;
+			this.vel.y = 0;
+			this.rotation = 0;
+		}
+	};
+
+	// Keep track of where the mouse is
+	var mouse = {x: 0, y: 0};
+	var v = {x: 0, y:0};
+	var p = {x:0, y:0};
+	c.canvas.onkeydown =
+		function(evt) {
+			// alert(evt.key);
+			if (evt.key == 'ArrowLeft') v.x = -1;
+			if (evt.key == 'ArrowRight') v.x = 1;
+			if (evt.key == 'ArrowUp') v.y = 1;
+			if (evt.key == 'ArrowDown') v.y = -1;
+
+		};
+
+	c.canvas.onmousemove =
+	  function(evt) {
+		mouse.x = evt.clientX;
+		mouse.y = evt.clientY;
+	  };
+
+
+	// Create objects
+	obj = new sprite([[0,0],[100,100],[100,0],[50,50]],[[0,1,2],[1,3,0,1]]);
+	obj2 = new sprite([[100,30],[140,10],[100,40],[150,250]],[[0,3,2],[1,3,0,1]]);
+	obj.vel.x = 0.1;
+	obj2.rotation = 10;
+	timeDiff = timeStep;
+	oldTime = 0;
+	
+
+
+	function update() {
+	  // Clear the canvas
+	  //newTime = Date.now();
+	  //if (oldTime != 0) timeDiff = newTime-OldTime
+	  //oldTime = newTime;
+	  c.fillRect(0, 0, w, h);
+
+	  // Draw our base in the center, rotated by angle
+	  c.strokeStyle="#77FF77";
+	  c.lineWidth=2;
+	  c.save();
+	  p.x += v.x;
+	  p.y += v.y;
+	  c.translate(w / 2+p.x, h / 2+p.y);
+	  //c.rotate(Math.PI * angle / 180);
+	  //c.strokeRect(-size / 2, -size / 2, size, size);
+	  //c.rotate(Math.PI * 30 / 180);
+	 // c.strokeRect(-size / 2, -size / 2, size, size);
+	  //c.rotate(Math.PI * 30 / 180);
+	  //c.strokeRect(-size / 2, -size / 2, size, size);
+	  obj.draw();
+	  obj2.draw();
+	  obj.update(timeStep);
+	  obj2.update(timeStep);
+	  c.restore();
+
+	  // Draw a line from the base to the mouse
+	  c.beginPath();
+	  c.moveTo(w / 2, h / 2);
+	  c.lineTo(mouse.x, mouse.y);
+	  c.closePath();
+	  c.stroke();
+
+	  // Increase the rotation a little each time
+	  angle += 2;
+
+	  clearTimeout(cmTID);
+	  // Do everything again in a while
+	  cmTID = setTimeout(update, timeStep);
+	}
+
+	update();
+	</script>
+   </body>
+</html>
